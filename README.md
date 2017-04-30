@@ -14,5 +14,12 @@ set up the environment:
 ```python3 -m pip instal virtualenv
 virtualenv flasktest
 cd flaskapp && . bin/activate
-git clone https://github.com/sylvaus/flasktest 
+pip install Flask
+git clone https://github.com/sylvaus/flasktest app 
+```
+
+start the app:
+```
+cd app
+python routes.py
 ```
