@@ -29,3 +29,9 @@ pip-log.txt
 venv
 *.pyc
 build
+
+#Latex
+*.aux
+*.log
+latex/*.pdf
+latex/*.synctex.gz

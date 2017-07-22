@@ -57,11 +57,11 @@ div .extended h2 {
 }
 
 div .extended p {
-    padding-left: 50px;
-    padding-right: 50px;
-    font-size: 18px;
-    line-height: 1.625;
-    color: #4f4f4f;
+    padding-left: 30px;
+    padding-right: 30px;
+    font-size: 15px;
+    line-height: 1.4;
+    color: #1f1f1f;
 }
 
 /* Home CSS

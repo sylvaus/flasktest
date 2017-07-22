@@ -1,0 +1,20 @@
+\documentclass[preview]{standalone}
+
+    
+% Related to math
+\usepackage{amsmath,amssymb,amsfonts,amsthm}
+
+\thispagestyle{empty}
+\begin{document}
+\newcommand{\vect}[1] {\mathbf{#1}}
+\begin{align*}
+\vect{q} &= a + b\vect{i} + c\vect{j} + d\vect{k} \\
+         &= \cos{\frac{\theta}{2}} + \vect{v}\sin{\frac{\theta}{2}} \\
+         &= e^{\vect{v}\frac{\theta}{2}} \\
+         &= \left[w \; x \; y \; z \right]^T \\
+         &= \left[q_0 \; q_1 \; q_2 \; q_3 \right]^T \\
+         &= \left[q_0 \; \vect{q}_v \right]^T
+\end{align*}
+
+
+\end{document}

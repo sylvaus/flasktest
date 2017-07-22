@@ -15,7 +15,7 @@ app = Flask(__name__)
 
 @app.context_processor
 def active_page_processor():
-    def get_active_page(active_page: int, page_number: int) -> str:
+    def get_active_page(active_page, page_number):
         if active_page == page_number:
             return "class=active"
         else:
@@ -28,7 +28,7 @@ def home():
 
 @app.route('/quaternion')
 def quaternion():
-  return render_template('quaternion.html', active_page=QUAT_NB, latex_notation=True)
+  return render_template('quaternion.html', active_page=QUAT_NB)
 
 @app.route('/pid')
 def pid():
