@@ -35,3 +35,5 @@ build
 *.log
 latex/*.pdf
 latex/*.synctex.gz
+latex/*.fls
+latex/*.fdb_latexmk

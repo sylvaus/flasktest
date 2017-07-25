@@ -8,6 +8,15 @@
     }
 }
 
+html {
+    height:100%;
+}
+
+html body {
+    background-color: rgba(200, 200, 200,1.00);
+    height:100%;
+}
+
 #custom-bootstrap-menu.navbar-default .navbar-brand {
     color: rgba(144, 175, 197, 1);
 }
@@ -16,6 +25,7 @@
     background-color: rgba(42, 49, 50, 1);
     border-width: 1px;
     border-radius: 4px;
+    margin-bottom: 0;
 }
 #custom-bootstrap-menu.navbar-default .navbar-nav>li>a {
     color: rgba(144, 175, 197, 1);
@@ -52,16 +62,30 @@
  * Shared CSS
  */
 
-div .extended h2 {
-    text-align: center
+div .extended .title {
+    padding-top: 20px;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+    font-family: garamond;
+    font-size: 35px;
+    text-align: center;
+    border-bottom: 1px solid #9F9F9F;
 }
 
 div .extended p {
     padding-left: 30px;
     padding-right: 30px;
+    font-family: sans-serif;
     font-size: 15px;
     line-height: 1.4;
     color: #1f1f1f;
+}
+
+div .main-frame {
+    background-color: #EFEFEF;
+    margin-bottom: 10px;
+    bottom:0px;
+    height:100%;
 }
 
 /* Home CSS

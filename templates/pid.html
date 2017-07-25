@@ -1,7 +1,13 @@
 {% extends "layout.html" %}  
 {% block content %}
 <div class="pid">
-  <h2>Quaternion</h2>
-  <p>This is an Abuut page for the Intro to Flask article. Don't I look good? Oh stop, you're making me blush.</p>
+  <div class="title">PID</div>
+  <p>PID stands for <b>P</b>roportional <b>I</b>ntegral <b>D</b>erivative. It is one of the simplest controller but it 
+    can be implemented to control complex and intricated system. The simplest form of the PID is:
+  </p>
+  <center><img src="{{ url_for('static', filename='img/PID.png') }}" width="85%" height="85%"></center>
+  <p>
+    where <b>e</b>(t) is the error and <b>u</b>(t) is the command computed by the PID.
+  </p>
 </div>
 {% endblock %}

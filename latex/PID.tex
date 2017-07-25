@@ -1,0 +1,15 @@
+\documentclass[preview]{standalone}
+
+    
+% Related to math
+\usepackage{amsmath,amssymb,amsfonts,amsthm}
+
+\thispagestyle{empty}
+\begin{document}
+\newcommand{\vect}[1] {\mathbf{#1}}
+\begin{align*}
+\vect{u}(t) &= K_p \vect{e}(t) + K_d\frac{d}{dt}\vect{e}(t) + K_i\int_0^t\vect{e}(t)  
+\end{align*}
+
+
+\end{document}

@@ -2,11 +2,11 @@ from __future__ import print_function
 import subprocess as sp
 
 
-def convert_pdf_to_png(in_path, out_path):
+def convert_pdf_to_png(in_path, out_path, density=2400, quality=100):
     # type: (str, str, str) -> bool
 
     try:
-        sp.check_call(["convert", "-density", "300", "-quality", "90", in_path, out_path])
+        sp.check_call(["convert", "-density", str(density), "-quality", str(quality), in_path, out_path])
         return True
     except sp.CalledProcessError as error:
         print(error.output)

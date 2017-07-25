@@ -62,12 +62,14 @@
         </div>   
     </div>    
         
-    <div class="container">
-        <div class="extended">
-        {% block content %} {% endblock %}
+    <div class="container" style="height:90%">
+        <div class="main-frame">
+            <div class="extended">
+                {% block content %} {% endblock %}
+            </div>
+   
         </div>
     </div>
-
     <script src="{{ url_for('static', filename='js/jquery-3.2.0.min.js') }}"></script>
     <script src="{{ url_for('static', filename='tether/js/tether.min.js') }}"></script>
     <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
