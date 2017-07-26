@@ -2,12 +2,15 @@
 {% block content %}
 <div class="pid">
   <div class="title">PID</div>
+  <h3>Introduction</h3>
   <p>PID stands for <b>P</b>roportional <b>I</b>ntegral <b>D</b>erivative. It is one of the simplest controller but it 
     can be implemented to control complex and intricated system. The simplest form of the PID is:
   </p>
   <center><img src="{{ url_for('static', filename='img/PID.png') }}" width="85%" height="85%"></center>
   <p>
-    where <b>e</b>(t) is the error and <b>u</b>(t) is the command computed by the PID.
+    where <b>e</b>(t) is the error and <b>u</b>(t) is the command computed by the PID. 
+    If we take the example of an electrical heater, <b>e</b>(t) would be the difference between the desired temperature <b>T</b><sub>d</sub>(t) 
+    and the current temperature <b>T</b>(t) and <b>u</b>(t) the current given to the heating resistor.
   </p>
 </div>
 {% endblock %}
