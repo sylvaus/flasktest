@@ -6,21 +6,31 @@
   <p>PID stands for <b>P</b>roportional <b>I</b>ntegral <b>D</b>erivative. It is one of the simplest controller but it 
     can be implemented to control complex and intricated system. The simplest form of the PID is:
   </p>
-  <center><img src="{{ url_for('static', filename='img/PID.png') }}" width="85%" height="85%"></center>
+  <center>$$
+      \begin{align*}
+      \mathbf{u}(t) = \quad &K_p \mathbf{e}(t)  &\text{Proportional term} \\
+                    + &K_d\frac{d}{dt}\mathbf{e}(t)  &\text{Derivative term} \\
+                    + &K_i\int_0^t\mathbf{e}(t)   &\text{Integral term} 
+      \end{align*}
+      $$
+  </center>
   <p>
-    where <b>e</b>(t) is the error and <b>u</b>(t) is the command computed by the PID. 
+    where `\mathbf{e}(t)` is the error and `\mathbf{u}(t)` is the command computed by the PID. 
   </p>
   <p>
-    If we take the example of an electrical heater, <b>e</b>(t) would be the difference between the desired temperature <b>T</b><sub>d</sub>(t) 
-    and the current temperature <b>T</b>(t) and <b>u</b>(t) the current given to the heating resistor.
+    If we take the example of an electrical heater, `\mathbf{e}(t)` would be the difference between the desired temperature `\mathbf{T}_d(t)`
+    and the current temperature `\mathbf{T}(t)` and `\mathbf{u}(t)` the current given to the heating resistor.
   </p>
   <h3>PID Three Terms</h3>
   <p>
     A PID is composed of three terms: Proportional, Derivative, Integral. These three terms will be explained using the example 
     of the electrical heater previously mentionned in the Introduction. 
   </p>
-  <h4>1. Proportional Term: <i>K<sub>p</sub></i>e(t)</h4>
-  <p>This term is the easiest to understand, </p>
+  <h4>1. Proportional Term</h4>
+  <p>This term is the easiest to understand, it is simply proportional to the error. Using the example of the heater, 
+    if we have an error of 1°C then the command will be Kp and if the error is 2°C then the command will be 2Kp. 
+    Therefore, a bigger Kp implies that the command will have a bigger amplitude for a given range of error.
+  </p>
   <h4>2. Derivative Term</h4>
   <h4>3. Integral Term</h4>
 

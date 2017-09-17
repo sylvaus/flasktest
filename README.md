@@ -21,7 +21,7 @@ Optional
 2. In the folder where you want to install the app run:  
 ```
 python3 -m pip instal virtualenv
-virtualenv flasktest
+virtualenv -p python3 flasktest
 cd flaskapp && . bin/activate
 pip install Flask
 git clone https://github.com/sylvaus/flasktest app

@@ -8,7 +8,9 @@
 \begin{document}
 \newcommand{\vect}[1] {\mathbf{#1}}
 \begin{align*}
-\vect{u}(t) &= K_p \vect{e}(t) + K_d\frac{d}{dt}\vect{e}(t) + K_i\int_0^t\vect{e}(t)  
+\vect{u}(t) = &\; K_p \vect{e}(t) \; \text{Proportional term} \\
+              &+ K_d\frac{d}{dt}\vect{e}(t)  \; \text{Derivative term} \\
+              &+ K_i\int_0^t\vect{e}(t)  \; \text{Integral term} 
 \end{align*}
 
 
