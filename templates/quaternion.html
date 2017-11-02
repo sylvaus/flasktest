@@ -3,6 +3,8 @@
 
     <div class="title">Quaternions</div>
     <p>Here, I won't give a long explanation about quaternions and more especially unit quaternions but a list of useful formulae.</p>
+    <h3>Quaternion</h3>
+    <h4>Definition</h4>
     <center>$$
         \begin{align*}
             \mathbf{q} &= a + b\mathbf{i} + c\mathbf{j} + d\mathbf{k} &=& A\left(\cos{\frac{\theta}{2}} + \mathbf{v}\sin{\frac{\theta}{2}}\right) \\
@@ -11,5 +13,22 @@
         \end{align*}
         $$
     </center>
+    <h4>Operations</h4>
+    <h3>Unit Quaternion</h3>
+    <h4>Definition</h4>
+    <center>$$
+        \begin{align*}
+            \mathbf{q} &= a + b\mathbf{i} + c\mathbf{j} + d\mathbf{k} &=& \cos{\frac{\theta}{2}} + \mathbf{v}\sin{\frac{\theta}{2}} \\
+            &= e^{\mathbf{v}\frac{\theta}{2}} &=& \left[w \; x \; y \; z \right]^T \\
+            &= \left[q_0 \; q_1 \; q_2 \; q_3 \right]^T &=& \left[q_0 \; \mathbf{q}_v \right]^T \\
+            \text{where}\\
+            \left\lVert\mathbf{q}\right\rVert_2 &= a^2 + b^2 + c^2 + d^2 \\
+                                                &= q_0^2 + q_1^2 + q_2^2 + q_3^2 \\
+                                                &= w^2 + x^2 + y^2 + z^2 \\
+                                                &= 1
+        \end{align*}
+        $$
+    </center>
+    <h4>Operations</h4>
 </div>
 {% endblock %}
