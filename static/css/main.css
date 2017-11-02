@@ -14,7 +14,6 @@ html {
 
 html body {
     background-color: rgba(230, 230, 230,1.00);
-    height:100%;
 }
 
 #custom-bootstrap-menu.navbar-default .navbar-brand {
@@ -108,7 +107,7 @@ div .extended h4 {
 }
 
 div .main-frame {
-    background-color: #EFEFEF;
+    background-color: rgb(247, 247, 247);
     margin-bottom: 10px;
     bottom:0px;
     height:100%;

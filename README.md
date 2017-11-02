@@ -23,7 +23,7 @@ Optional
 python3 -m pip instal virtualenv
 virtualenv -p python3 flasktest
 cd flaskapp && . bin/activate
-pip install Flask
+pip install Flask pygal
 git clone https://github.com/sylvaus/flasktest app
 ```
 
