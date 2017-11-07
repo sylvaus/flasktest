@@ -28,24 +28,21 @@ def active_page_processor():
 
 
 def pygalexample(P=5, I=0, D=1):
-    graph = pygal.Line()
-    graph.title = "PID Response (P: {}, I: {}, D: {})".format(P, I, D)
-    controller = PIDController(10, 0.1, 9, 0)
-    simulation = SimulationModel(4, 0.1, -0.1, 0.1) 
+    graph = pygal.XY(show_dots=False)
+    graph.title = """PID Response (P: {}, I: {}, D: {})"
+                  Model: mass a = mass gravity + drag v|v| + control force """.format(P, I, D)
+    controller = PIDController(P, I, D, 0)
+    simulation = SimulationModel(4, 0.1, -0.1, 0.5) 
     target = 20
-    x_labels = []
-    y_values = []
-    for _ in range(500):
+    points = []
+    for _ in range(100):
         timestamp, position, velocity = simulation.get_state()
-        x_labels.append(str(timestamp))
-        y_values.append(position)
+        points.append((timestamp, position))
         control_output = controller.compute_control(target - position, velocity)
         simulation.step(control_output)
 
-
-    graph.x_labels = x_labels
-    graph.add('PID',  y_values)
-    graph.add('Target',  [target for _ in x_labels])
+    graph.add('PID',  points)
+    graph.add('Target',  [(points[0][0], target), (points[-1][0], target)])
     return graph.render_data_uri()
 
 @app.route('/')
@@ -81,6 +78,11 @@ def kalman():
 @app.route('/filters')
 def filters():
     return render_template('filters.html', active_page=CONTROL_NB)
+
+
+@app.route('/tustin')
+def tustin():
+    return render_template('tustin.html', active_page=CONTROL_NB)
 
 
 @app.route('/code')

@@ -2,6 +2,12 @@
 {% block content %}
 <div class="pid">
   <div class="title">PID</div>
+  <h3>Vocabulary</h3>
+  <p>
+  <b>Rise time:</b> time for the system to reach the desired value
+  <b>Settling time:</b> time for the system to reach and stay within a small band (usually 5% of the desired value) around the desired value <br>
+  <b>Overshoot(%):</b> Maximum value reached divided by the desired value 
+  </p>
   <h3>Introduction</h3>
   <p>PID stands for <b>P</b>roportional <b>I</b>ntegral <b>D</b>erivative. It is one of the simplest controller but it 
     can be implemented to control complex and intricated system. The simplest form of the PID is:
@@ -21,6 +27,7 @@
     If we take the example of an electrical heater, `\mathbf{e}(t)` would be the difference between the desired temperature `\mathbf{T}_d(t)`
     and the current temperature `\mathbf{T}(t)` and `\mathbf{u}(t)` the current given to the heating resistor.
   </p>
+
   <h3>PID Three Terms</h3>
   <p>
     A PID is composed of three terms: Proportional, Derivative, Integral. These three terms will be explained using the example 
@@ -32,16 +39,61 @@
     if we have an error of 1°C then the command will be `K_p` and if the error is 2°C then the command will be 2`K_p`. 
     <br>
     Therefore, a bigger `K_p` implies that the command will be bigger for a given error and thus, this parameter should be used 
-    to have a faster response time which is the time to reach the desired state. 
+    to have a faster response time. 
   </p>
   <h4>2. Derivative Term</h4>
   <p>
-    
+    The derivative is proportional to the velocity of the error an since the velocity of the error is defined as 
+    `\frac{d(\mathbf{T}_d(t) - \mathbf{T}(t))}{dt}`, it means that this term increases the control output 
+    if the desired temperature increases faster than the actual temperature and vice-versa.<br>
+    This allow the controller to react more quickly if the desired value gets further away but more
+    importantly will allow the controller to not overshoot. Indeed, if the desired value is not changing then 
+    the velocity of the error becomes `\frac{- d\mathbf{T}(t)}{dt}` which is the opposite of the rate of the change of
+    the current temperature and implies that the derivative will slow down the system, thus reducing the chance of 
+    overshoot.
   </p>
   <h4>3. Integral Term</h4>
+
+  <h4>4. Try it</h4>
   <p>
   <center>
   <embed type="image/svg+xml" src={{graph_data|safe}} style='max-width:600px'/>
+  <div>
+    <div class="range-slider">
+        <span>P: </span>
+        <input class="range-slider__range" type="range" value="400" min="0" max="500">
+        <span class="range-slider__value">0</span>
+    </div> 
+    <div class="range-slider">
+        <span>I: </span>
+      <input class="range-slider__range" type="range" value="400" min="0" max="500">
+      <span class="range-slider__value">0</span>
+    </div> 
+  
+    <div class="range-slider">
+        <span>D: </span>
+      <input class="range-slider__range" type="range" value="400" min="0" max="500">
+      <span class="range-slider__value">0</span>
+    </div> 
+  </div>
+  <div>
+      <div class="range-slider">
+          <span>Mass:</span>
+          <input class="range-slider__range" type="range" value="400" min="0" max="500">
+          <span class="range-slider__value">0</span>
+      </div> 
+      <div class="range-slider">
+          <span>Gravity: </span>
+        <input class="range-slider__range" type="range" value="400" min="0" max="500">
+        <span class="range-slider__value">0</span>
+      </div> 
+    
+      <div class="range-slider">
+          <span>Drag: </span>
+        <input class="range-slider__range" type="range" value="400" min="0" max="500">
+        <span class="range-slider__value">0</span>
+      </div> 
+    </div>
   </center>
   </p>
 </div>

@@ -6,8 +6,9 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/slider.css') }}">
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -47,6 +48,8 @@
                             <li role="separator" class="divider"></li>
                             <li><a href="{{ url_for('kalman') }}">Kalman Filter</a></li>
                             <li><a href="{{ url_for('filters') }}">Some simple filters</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="{{ url_for('tustin') }}">Discretization: Tustin Method</a></li>
                         </ul>
                     </li>
                     <li {{get_active_page(6, active_page)}}><a href="{{ url_for('code') }}">Code</a>
@@ -58,8 +61,7 @@
                 </ul>
             </div>
         </div>   
-    </div>    
-        
+    </div>      
     <div class="container" style="height:90%">
         <div class="main-frame">
             <div class="extended">
@@ -69,6 +71,7 @@
         </div>
     </div>
     <script src="{{ url_for('static', filename='js/jquery-3.2.0.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/slider.js') }}"></script>
     <script src="{{ url_for('static', filename='tether/js/tether.min.js') }}"></script>
     <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
 </body>
