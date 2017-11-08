@@ -54,47 +54,66 @@
   </p>
   <h4>3. Integral Term</h4>
 
-  <h4>4. Try it</h4>
+  <h4 id="graph_anchor">4. Try it</h4>
   <p>
   <center>
   <embed type="image/svg+xml" src={{graph_data|safe}} style='max-width:600px'/>
+  <form action="/pid", method="POST">
   <div>
     <div class="range-slider">
         <span>P: </span>
-        <input class="range-slider__range" type="range" value="400" min="0" max="500">
+        <input class="range-slider__range" type="range" 
+               value="{{P_input}}" min="0" max="10" step=0.01 name="P">
         <span class="range-slider__value">0</span>
     </div> 
     <div class="range-slider">
         <span>I: </span>
-      <input class="range-slider__range" type="range" value="400" min="0" max="500">
-      <span class="range-slider__value">0</span>
+        <input class="range-slider__range" type="range" 
+               value="{{I_input}}" min="0" max="3" step=0.01 name="I">
+        <span class="range-slider__value">0</span>
     </div> 
   
     <div class="range-slider">
         <span>D: </span>
-      <input class="range-slider__range" type="range" value="400" min="0" max="500">
-      <span class="range-slider__value">0</span>
+        <input class="range-slider__range" type="range" 
+               value="{{D_input}}" min="0" max="30" step=0.01 name="D">
+        <span class="range-slider__value">0</span>
     </div> 
   </div>
   <div>
       <div class="range-slider">
           <span>Mass:</span>
-          <input class="range-slider__range" type="range" value="400" min="0" max="500">
+          <input class="range-slider__range" type="range" 
+                 value="{{mass_input}}" min="1" max="20" step=0.01 name="mass">
           <span class="range-slider__value">0</span>
       </div> 
       <div class="range-slider">
           <span>Gravity: </span>
-        <input class="range-slider__range" type="range" value="400" min="0" max="500">
-        <span class="range-slider__value">0</span>
+          <input class="range-slider__range" type="range" 
+                 value="{{gravity_input}}" min="-1" max="1" step=0.01 name="gravity">
+          <span class="range-slider__value">0</span>
       </div> 
     
       <div class="range-slider">
-          <span>Drag: </span>
-        <input class="range-slider__range" type="range" value="400" min="0" max="500">
+        <span>Drag: </span>
+        <input class="range-slider__range" type="range" 
+               value="{{drag_input}}" min="0" max="2" step=0.01 name="drag">
         <span class="range-slider__value">0</span>
       </div> 
     </div>
+    <div margin-top=5>
+      <input type="submit" value="Update Graph">
+    </div>
+   </form>
   </center>
   </p>
 </div>
+
+{% if scroll %}
+<script>
+    document.getElementById('{{ scroll }}').scrollIntoView();
+    // or
+    document.location.hash = '#' + '{{ scroll }}';
+</script>
+{% endif %}
 {% endblock %}

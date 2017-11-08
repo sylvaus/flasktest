@@ -1,5 +1,5 @@
 import pygal
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from pid import SimulationModel, PIDController
 
 ######### CONSTANTS ###########
@@ -27,15 +27,15 @@ def active_page_processor():
     return dict(get_active_page=get_active_page)
 
 
-def pygalexample(P=5, I=0, D=1):
+def pid_response_graph(P, I, D, mass, drag, gravity):
     graph = pygal.XY(show_dots=False)
     graph.title = """PID Response (P: {}, I: {}, D: {})"
                   Model: mass a = mass gravity + drag v|v| + control force """.format(P, I, D)
     controller = PIDController(P, I, D, 0)
-    simulation = SimulationModel(4, 0.1, -0.1, 0.5) 
+    simulation = SimulationModel(mass, drag, gravity, 0.05) 
     target = 20
     points = []
-    for _ in range(100):
+    for _ in range(1000):
         timestamp, position, velocity = simulation.get_state()
         points.append((timestamp, position))
         control_output = controller.compute_control(target - position, velocity)
@@ -55,9 +55,22 @@ def quaternion():
     return render_template('quaternion.html', active_page=QUAT_NB, latex_notation=True)
 
 
-@app.route('/pid')
+@app.route('/pid', methods=['GET', 'POST'])
 def pid():
-    return render_template('pid.html', active_page=CONTROL_NB, latex_notation=True, graph_data = pygalexample())
+    anchor = ""
+    if request.method == "POST":
+        P, I, D = list(map(float, [request.form["P"], request.form["I"], request.form["D"]]))
+        mass, drag, gravity = list(map(float, [request.form["mass"], request.form["drag"], request.form["gravity"]]))
+        anchor = "graph_anchor"
+    else:
+        P, I, D = [4, 0, 1]
+        mass, drag, gravity = [4, 0.1, 0.0]
+
+    return render_template('pid.html', active_page=CONTROL_NB, 
+                           latex_notation=True, scroll=anchor,
+                           graph_data = pid_response_graph(P, I, D, mass, drag, gravity),
+                           P_input=P, I_input=I, D_input=D, 
+                           mass_input=mass, drag_input=drag, gravity_input=gravity, )
 
 
 @app.route('/lqr')
