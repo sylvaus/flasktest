@@ -14,6 +14,17 @@
         $$
     </center>
     <h4>Operations</h4>
+    <center>$$
+        \begin{align*}
+            &\lVert \mathbf{q} \rVert &=&  \quad q_0^2 + q_1^2 + q_2^2 + q_3^2 \\
+            &ln(\mathbf{q}) &=& \quad ln(\lVert \mathbf{q} \rVert) + \frac{\mathbf{q}_v}{\lVert \mathbf{q}_v \rVert} \arccos(\frac{q_0}{\mathbf{q}}) \\
+            &exp(\mathbf{q}) &=& \quad e^{q_0} + \left(\cos(\lVert \mathbf{q}_v \rVert) + \frac{\mathbf{q}_v}{\lVert \mathbf{q}_v \rVert} \sin(\lVert \mathbf{q}_v \rVert) \right) \\
+            &\mathbf{q} \cdot  \mathbf{p} &=& \quad \begin{bmatrix} q_0 p_0 - \mathbf{q}_v \cdot \mathbf{p}_v \\ q_0 \mathbf{p}_v + p_0 \mathbf{q}_v + \mathbf{q}_v \times \mathbf{p}_v \end{bmatrix}  \\
+            &conjugate(\mathbf{q}) &=&  \quad \left[q_0 \; \text{-}\mathbf{q}_v \right]^T \\
+            &inverse(\mathbf{q}) &=&  \quad \frac{conjugate(\mathbf{q})}{\lVert \mathbf{q} \rVert}
+        \end{align*}
+        $$
+    </center>
     <h3>Unit Quaternion</h3>
     <h4>Definition</h4>
     <center>$$
@@ -30,5 +41,16 @@
         $$
     </center>
     <h4>Operations</h4>
+    <center>$$
+        \begin{align*}
+            &\lVert \mathbf{q} \rVert &=& \quad 1 \\
+            &ln(\mathbf{q}) &=& \quad \frac{\mathbf{q}_v}{\lVert \mathbf{q}_v \rVert} \arccos(q_0)) = \arctan(\frac{q_0}{\mathbf{q}_v})\\
+            &exp(\mathbf{q}) &=& \quad e^{q_0} + \left(\cos(\lVert \mathbf{q}_v \rVert) + \frac{\mathbf{q}_v}{\lVert \mathbf{q}_v \rVert} \sin(\lVert \mathbf{q}_v \rVert) \right) \\
+            &\mathbf{q} \cdot \mathbf{p} &=& \quad \begin{bmatrix} q_0 p_0 - \mathbf{q}_v \cdot \mathbf{p}_v \\ q_0 \mathbf{p}_v + p_0 \mathbf{q}_v + \mathbf{q}_v \times \mathbf{p}_v \end{bmatrix}  \\
+            &conjugate(\mathbf{q}) &=&  \quad \left[q_0 \; \text{-}\mathbf{q}_v \right]^T \\
+            &inverse(\mathbf{q}) &=&  \quad conjugate(\mathbf{q})
+        \end{align*}
+        $$
+    </center>
 </div>
 {% endblock %}
