@@ -4,9 +4,10 @@
   <div class="title">PID</div>
   <h3>Vocabulary</h3>
   <p>
-  <b>Rise time:</b> time for the system to reach the desired value
+  <b>Rise time:</b> time for the system to reach the desired value<br>
   <b>Settling time:</b> time for the system to reach and stay within a small band (usually 5% of the desired value) around the desired value <br>
-  <b>Overshoot(%):</b> Maximum value reached divided by the desired value 
+  <b>Overshoot(%):</b> Maximum value reached divided by the desired value<br>
+  <b>Steady-state error:</b> Error between the desired state and the system state when time goes to infinity 
   </p>
   <h3>Introduction</h3>
   <p>PID stands for <b>P</b>roportional <b>I</b>ntegral <b>D</b>erivative. It is one of the simplest controller but it 
@@ -21,7 +22,8 @@
       $$
   </center>
   <p>
-    where `\mathbf{e}(t)` is the error and `\mathbf{u}(t)` is the command computed by the PID. 
+    where `\mathbf{e}(t)` is the error and `\mathbf{u}(t)` is the command computed by the PID. The error is the difference 
+    between the desired input and the desired output.
   </p>
   <p>
     If we take the example of an electrical heater, `\mathbf{e}(t)` would be the difference between the desired temperature `\mathbf{T}_d(t)`
@@ -42,7 +44,7 @@
     to have a faster response time. 
   </p>
   <h4>2. Derivative Term</h4>
-  <p>
+  <p align="justify">
     The derivative is proportional to the velocity of the error an since the velocity of the error is defined as 
     `\frac{d(\mathbf{T}_d(t) - \mathbf{T}(t))}{dt}`, it means that this term increases the control output 
     if the desired temperature increases faster than the actual temperature and vice-versa.<br>
@@ -50,11 +52,48 @@
     importantly will allow the controller to not overshoot. Indeed, if the desired value is not changing then 
     the velocity of the error becomes `\frac{- d\mathbf{T}(t)}{dt}` which is the opposite of the rate of the change of
     the current temperature and implies that the derivative will slow down the system, thus reducing the chance of 
-    overshoot.
+    overshoot. 
+  </p>
+  <p align="justify">
+    Limiting or completely eliminating the overshoot can be mandatory for some systems, e.g, 
+    CNC Machines (would create parts with defaults) or industrial ovens (would burn the products).
   </p>
   <h4>3. Integral Term</h4>
+  <p align="justify">
+    The Integral is the hardest term to visualize and also the most dangerous for your system. 
+    The first thing you want to learn is how to determine if you need an integral term to control your system.
+    Some systems can tolerate a non-zero steady-state error or do not need the integral term to reach 
+    zero steady-state error. The easy way to find out if your system requires an integral term to reach 
+    a zero steady-state error is to ask the question: Can the system maintain the desired state with a 
+    control command (PID output) of 0. If the answer is no, you may need an integral term.
+    Indeed, maintaining the system state at the desired state implies that the error is 0 and the velocity 
+    of the error is also 0. This will lead to both the proportional and derivative terms being 0 and thus, 
+    the only option left to have a non-zero control output is the integral term. The integral term grows proportionaly
+    to the error. Therefore, while the proportional terms pulls your state closer to the desired state and the 
+    derivative term slows it down to avoid overshooting, the integral term grows and will maintain its non zero value
+    when the desired state is reached.
+  </p>
+  <p align="justify">
+    Using the heater as the example, if you are trying to control a perfectly insulated room then you don't need an 
+    integral term since the temperature will remain constant if the heater does add more heat. <br>
+    However, if the room is constantly losing heat (which is the case in real life) and you want to reach the exact 
+    desired temperature you will need the integral term. I emphasize the exactly since the proportional and derivative
+    terms can be enough if you can tolerate the steady-state error. 
+  </p>
+  <p align="justify">
+    If you need an integral term, you need to be careful about one thing: <b>Integral Windup</b>. This happens for 
+    one main reason: the desired state is really far from the system initial state. The integral term will have too
+    much time to increase and thus, will be significantly bigger than the force that would be needed to maintain the 
+    system at the desired state. This will, in the best case, make the system overshoot and in the worst case, 
+    make the system unstable and goes to infinity. <br>
+    There are many solutions to avoid integral windup. The two easiest to implement are: 1) Restrict the integral 
+    term to a fixed range 2) Only increase/decrease the integral term when the system is close enough to the desired
+    state.
+  </p>
 
-  <h4 id="graph_anchor">4. Try it</h4>
+
+
+  <h3 id="graph_anchor">Try it</h3>
   <p>
   <center>
   <embed type="image/svg+xml" src={{graph_data|safe}} style='max-width:600px'/>
@@ -63,13 +102,13 @@
     <div class="range-slider">
         <span>P: </span>
         <input class="range-slider__range" type="range" 
-               value="{{P_input}}" min="0" max="10" step=0.01 name="P">
+               value="{{P_input}}" min="0" max="40" step=0.01 name="P">
         <span class="range-slider__value">0</span>
     </div> 
     <div class="range-slider">
         <span>I: </span>
         <input class="range-slider__range" type="range" 
-               value="{{I_input}}" min="0" max="3" step=0.01 name="I">
+               value="{{I_input}}" min="0" max="1" step=0.005 name="I">
         <span class="range-slider__value">0</span>
     </div> 
   
@@ -97,7 +136,7 @@
       <div class="range-slider">
         <span>Drag: </span>
         <input class="range-slider__range" type="range" 
-               value="{{drag_input}}" min="0" max="2" step=0.01 name="drag">
+               value="{{drag_input}}" min="0" max="1" step=0.01 name="drag">
         <span class="range-slider__value">0</span>
       </div> 
     </div>
