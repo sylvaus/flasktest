@@ -63,10 +63,16 @@ class Quaternion {
     this.array = this.array.map(val => {return val * factor})
   }
 
-  /*
+  get_scaled(factor : number) : Quaternion {
+    return new Quaternion(this.array[0] * factor, this.array[1] * factor,
+                          this.array[2] * factor, this.array[3] * factor)
+  }
 
+  add(other : Quaternion) : Quaternion {
+    return new Quaternion(this.array[0] + other.array[0], this.array[1] + other.array[1],
+                          this.array[2] + other.array[2], this.array[3] + other.array[3])
+  }
 
-  */
   mult(other : Quaternion) : Quaternion {
     return new Quaternion(this.array[0] * other.array[0] - this.array[1] * other.array[1] - this.array[2] * other.array[2]- this.array[3] * other.array[3],
                           this.array[0] * other.array[1] + this.array[1] * other.array[0] + this.array[2] * other.array[3]- this.array[3] * other.array[2],
@@ -146,4 +152,44 @@ class Quaternion {
                           cy * cr * sp + sy * sr * cp,
                           sy * cr * cp - cy * sr * sp)
   }
+}
+
+function lerp(quat_from : Quaternion, quat_to : Quaternion, coeff : number) : Quaternion {
+  let scaled_quat_from = quat_from.get_scaled(1 - coeff);
+  let scaled_quat_to = quat_from.get_scaled(coeff);
+  return scaled_quat_from.add(scaled_quat_to);
+}
+
+function nlerp(quat_from : Quaternion, quat_to : Quaternion, coeff : number) : Quaternion {
+  let scaled_quat_from = quat_from.get_scaled(1 - coeff);
+  let scaled_quat_to = quat_from.get_scaled(coeff);
+  let result = scaled_quat_from.add(scaled_quat_to);
+  result.normalize();
+  return result;
+}
+
+function slerp(quat_from : Quaternion, quat_to : Quaternion, 
+               coeff : number, shortest_path : boolean = false) : Quaternion {
+  let normalized_quat_from = quat_from.get_normalized();
+  let normalized_quat_to = quat_from.get_normalized();
+  let dot = normalized_quat_from.dot(normalized_quat_to);
+  if (Math.abs(dot) > 0.9995) {
+    return nlerp(normalized_quat_from, normalized_quat_to, coeff)
+  }
+
+  if (shortest_path && (dot < 0.0)){
+    dot = -dot
+    normalized_quat_to.scale(-1)
+  }
+
+  if (Math.abs(dot) > 0){
+    dot = Math.sign(dot)
+  }
+
+  let delta_angle = Math.acos(dot) * coeff;
+  let quat_to_normal = normalized_quat_to.add(normalized_quat_from.get_scaled(-dot))
+  quat_to_normal.normalize();
+
+  return quat_to_normal.get_scaled(Math.sin(delta_angle))
+          .add(quat_from.get_scaled(Math.cos(delta_angle)));
 }
