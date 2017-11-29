@@ -22,6 +22,10 @@ class Quaternion {
     this.array = [this.array[0], -this.array[1], -this.array[2], -this.array[3]] 
   }
 
+  get_array() : number[] {
+    return this.array
+  }
+
   get_norm() : number {
     return Math.sqrt(this.array[0] * this.array[0] + this.array[1] * this.array[1]
                      + this.array[2] * this.array[2] + this.array[3] * this.array[3])
@@ -120,7 +124,7 @@ class Quaternion {
     let y2 = this.array[2] ** 2
     
     let sin_roll = +2.0 * (this.array[0] * this.array[1] + this.array[2] * this.array[3])
-    let cos_roll = +1.0 - 2.0 * ((this.array[0] ** 2) + y2)
+    let cos_roll = +1.0 - 2.0 * ((this.array[1] ** 2) + y2)
     let roll = Math.atan2(sin_roll, cos_roll)
     
     let sin_pitch = +2.0 * (this.array[0] * this.array[2] - this.array[3] * this.array[1])
@@ -192,4 +196,62 @@ function slerp(quat_from : Quaternion, quat_to : Quaternion,
 
   return quat_to_normal.get_scaled(Math.sin(delta_angle))
           .add(quat_from.get_scaled(Math.cos(delta_angle)));
+
 }
+
+
+function to_rot_matrix(){
+  var quat_w = parseFloat((<HTMLInputElement>document.getElementById("quat_w")).value);
+  var quat_x = parseFloat((<HTMLInputElement>document.getElementById("quat_x")).value);
+  var quat_y = parseFloat((<HTMLInputElement>document.getElementById("quat_y")).value);
+  var quat_z = parseFloat((<HTMLInputElement>document.getElementById("quat_z")).value);
+  if(isNaN(quat_w)){alert("w value is not a number"); return;}
+  if(isNaN(quat_x)){alert("x value is not a number"); return;}
+  if(isNaN(quat_y)){alert("y value is not a number"); return;}
+  if(isNaN(quat_z)){alert("z value is not a number"); return;}
+  var quaternion =  new Quaternion(quat_w, quat_x, quat_y, quat_z);
+  quaternion.normalize();
+  var matrix = quaternion.to_rot_matrix();
+  (<HTMLDivElement>document.getElementById("rotation_matrix")).innerText =  "$$\\begin{bmatrix} " + matrix[0][0].toPrecision(5) + "\\quad" + matrix[0][1].toPrecision(5)  + "\\quad" + matrix[0][2].toPrecision(5) + "\\\\" + 
+                                                                                                     matrix[1][0].toPrecision(5) + "\\quad" + matrix[1][1].toPrecision(5)  + "\\quad" + matrix[1][2].toPrecision(5) + "\\\\" + 
+                                                                                                     matrix[2][0].toPrecision(5) + "\\quad" + matrix[2][1].toPrecision(5)  + "\\quad" + matrix[2][2].toPrecision(5) + "\\end{bmatrix}$$";
+  MathJax.Hub.Queue(["Typeset",MathJax.Hub,"rotation_matrix"]);
+}
+
+function to_euler_angles(){
+  var quat_w = parseFloat((<HTMLInputElement>document.getElementById("quat_euler_w")).value);
+  var quat_x = parseFloat((<HTMLInputElement>document.getElementById("quat_euler_x")).value);
+  var quat_y = parseFloat((<HTMLInputElement>document.getElementById("quat_euler_y")).value);
+  var quat_z = parseFloat((<HTMLInputElement>document.getElementById("quat_euler_z")).value);
+  if(isNaN(quat_w)){alert("w value is not a number"); return;}
+  if(isNaN(quat_x)){alert("x value is not a number"); return;}
+  if(isNaN(quat_y)){alert("y value is not a number"); return;}
+  if(isNaN(quat_z)){alert("z value is not a number"); return;}
+  var quaternion =  new Quaternion(quat_w, quat_x, quat_y, quat_z);
+  quaternion.normalize();
+  var angles = quaternion.to_euler_angles();
+  (<HTMLDivElement>document.getElementById("euler_angles")).innerText =  "$$\\text{roll}=" + angles[0].toPrecision(5) + 
+                                                                         "\\text{, pitch}=" + angles[1].toPrecision(5) + 
+                                                                         "\\text{, yaw}=" + angles[2].toPrecision(5) + "$$";
+  MathJax.Hub.Queue(["Typeset",MathJax.Hub,"euler_angles"]);
+}
+
+function to_quaternion(){
+  var roll = parseFloat((<HTMLInputElement>document.getElementById("roll")).value);
+  var pitch = parseFloat((<HTMLInputElement>document.getElementById("pitch")).value);
+  var yaw = parseFloat((<HTMLInputElement>document.getElementById("yaw")).value);
+  if(isNaN(roll)){alert("roll value is not a number"); return;}
+  if(isNaN(pitch)){alert("pitch value is not a number"); return;}
+  if(isNaN(yaw)){alert("y value is not a number"); return;}
+  var quaternion =  Quaternion.from_euler_angles(roll, pitch, yaw);
+  var array = quaternion.get_array();
+  (<HTMLDivElement>document.getElementById("quaternion_from_euler")).innerText =  "$$\\mathbf{q}=\\; [" + array[0].toPrecision(5) + " \\; " +
+                                                                                                                array[1].toPrecision(5) + " \\; " + 
+                                                                                                                array[2].toPrecision(5) + " \\; " + 
+                                                                                                                array[3].toPrecision(5) + "]$$";
+  MathJax.Hub.Queue(["Typeset",MathJax.Hub,"quaternion_from_euler"]);
+}
+
+
+
+

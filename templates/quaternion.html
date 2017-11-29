@@ -57,7 +57,34 @@
         corresponds to the rotation of `\theta` about the axis `\mathbf{v}`.
         </p>
         <h4>Conversion Quaternion Rotation Matrix</h4>
+        <p>
+            <center>
+                w: <input type="text" id="quat_w" size="5">
+                x: <input type="text" id="quat_x" size="5">
+                y: <input type="text" id="quat_y" size="5">
+                z: <input type="text" id="quat_z" size="5">   
+                <button onclick="to_rot_matrix()">To Rotation Matrix</button>
+                <div id="rotation_matrix"></div>    
+            </center>
+        </p>
         <h4>Conversion Quaternion Euler Angles</h4>
+        <p>
+            <center>
+                w: <input type="text" id="quat_euler_w" size="5">
+                x: <input type="text" id="quat_euler_x" size="5">
+                y: <input type="text" id="quat_euler_y" size="5">
+                z: <input type="text" id="quat_euler_z" size="5">   
+                <button onclick="to_euler_angles()">To Euler Angles</button>
+                <div id="euler_angles"></div>    
+            <br>
+                roll (x): <input type="text" id="roll" size="5">
+                pitch (y): <input type="text" id="pitch" size="5">
+                yaw (z): <input type="text" id="yaw" size="5">
+                <button onclick="to_quaternion()">To Quaternion</button>
+                <div id="quaternion_from_euler"></div>    
+            </center>
+        </p>
         <h4>Implementation</h4>
+    <script src="{{ url_for('static', filename='js/quaternion.js') }}"></script>
 </div>
 {% endblock %}
