@@ -54,7 +54,8 @@
             </center>
     <h3>Unit Quaternion As Rotation</h3>
         <p>The unit quaternion `\mathbf{q} = \cos\frac{\theta}{2} + \mathbf{v}\sin\frac{\theta}{2}` 
-        corresponds to the rotation of `\theta` about the axis `\mathbf{v}`.
+        corresponds to the rotation of `\theta` about the axis `\mathbf{v}`. <br> 
+        The maths for these conversions can be found on <a href="https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles">Wikipedia</a>.
         </p>
         <h4>Conversion Quaternion Rotation Matrix</h4>
         <p>
@@ -84,7 +85,6 @@
                 <div id="quaternion_from_euler"></div>    
             </center>
         </p>
-        <h4>Implementation</h4>
     <script src="{{ url_for('static', filename='js/quaternion.js') }}"></script>
 </div>
 {% endblock %}
