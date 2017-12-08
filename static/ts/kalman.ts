@@ -1,14 +1,14 @@
 import { Matrix } from "./matrix";
 
 class KalmanFilter{
-  F : Matrix
-  B : Matrix
-  H : Matrix
-  Q : Matrix
-  R : Matrix
-  P : Matrix
-  I : Matrix
-  x : Matrix
+  F : Matrix;
+  B : Matrix;
+  H : Matrix;
+  Q : Matrix;
+  R : Matrix;
+  P : Matrix;
+  I : Matrix;
+  x : Matrix;
   constructor( F : Matrix, B : Matrix, H : Matrix, Q : Matrix, 
                R : Matrix, P : Matrix, x : Matrix) {
     this.F = F;
@@ -23,7 +23,11 @@ class KalmanFilter{
     
   update(z : Matrix, u : Matrix): Matrix {
     // Predict
-    this.x = (this.F.mult(this.x)).add(this.B.mult(u));
+    if (this.B == null) {
+        this.x = (this.F.mult(this.x));
+    } else {
+        this.x = (this.F.mult(this.x)).add(this.B.mult(u));
+    }
     this.P = ((this.F.mult(this.P)).mult(this.F.transpose())).add(this.Q);
     // Update
     let y = z.sub(this.H.mult(this.x));
@@ -34,3 +38,5 @@ class KalmanFilter{
     return this.x;
   }
 }
+
+export { KalmanFilter };

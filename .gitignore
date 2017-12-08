@@ -39,3 +39,6 @@ latex/*.fls
 latex/*.fdb_latexmk
 
 .vscode
+
+# TSLINT
+node_modules/
