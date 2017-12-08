@@ -8,7 +8,6 @@ QUAT_NB = 2
 CONTROL_NB = 5
 ABOUT_NB = 3
 CONTACT_NB = 4
-CODE_NB = 6
 
 ###############################
 
@@ -76,11 +75,6 @@ def filters():
 @app.route('/tustin')
 def tustin():
     return render_template('tustin.html', active_page=CONTROL_NB)
-
-
-@app.route('/code')
-def code():
-    return render_template('code.html', active_page=CODE_NB)
 
 
 @app.route('/about')
