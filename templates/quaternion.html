@@ -58,33 +58,81 @@
         The maths for these conversions can be found on <a href="https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles">Wikipedia</a>.
         </p>
         <h4>Conversion Quaternion Rotation Matrix</h4>
-        <p>
+        <div style="line-height: 2.25;">
             <center>
-                w: <input type="text" id="quat_w" size="5">
-                x: <input type="text" id="quat_x" size="5">
-                y: <input type="text" id="quat_y" size="5">
-                z: <input type="text" id="quat_z" size="5">   
-                <button onclick="to_rot_matrix()">To Rotation Matrix</button>
+                w: <input type="text" id="quat_w" size="5" style="line-height: 1.5;">
+                x: <input type="text" id="quat_x" size="5" style="line-height: 1.5;">
+                y: <input type="text" id="quat_y" size="5" style="line-height: 1.5;">
+                z: <input type="text" id="quat_z" size="5" style="line-height: 1.5;">   
+                <button onclick="to_rot_matrix()" style="line-height: 1.5;">To Rotation Matrix</button>
                 <div id="rotation_matrix"></div>    
             </center>
-        </p>
-        <h4>Conversion Quaternion Euler Angles</h4>
-        <p>
+        </div>
+
+        <h4>Conversion Quaternion Euler To Angles</h4>
+        <div style="line-height: 2.25;">
             <center>
-                w: <input type="text" id="quat_euler_w" size="5">
-                x: <input type="text" id="quat_euler_x" size="5">
-                y: <input type="text" id="quat_euler_y" size="5">
-                z: <input type="text" id="quat_euler_z" size="5">   
-                <button onclick="to_euler_angles()">To Euler Angles</button>
-                <div id="euler_angles"></div>    
-            <br>
-                roll (x): <input type="text" id="roll" size="5">
-                pitch (y): <input type="text" id="pitch" size="5">
-                yaw (z): <input type="text" id="yaw" size="5">
-                <button onclick="to_quaternion()">To Quaternion</button>
+                w: <input type="text" id="quat_euler_w" size="5" style="line-height: 1.5;">
+                x: <input type="text" id="quat_euler_x" size="5" style="line-height: 1.5;">
+                y: <input type="text" id="quat_euler_y" size="5" style="line-height: 1.5;">
+                z: <input type="text" id="quat_euler_z" size="5" style="line-height: 1.5;">   
+                <button onclick="to_euler_angles()" style="line-height: 1.5;">To Euler Angles</button>
+                <div id="euler_angles"></div>
+            </center>
+        
+        <h4>Conversion Euler Angles To Quaternion</h4>
+        <div style="line-height: 2.25;">
+            <center>
+                roll (x): <input type="text" id="roll" size="5" style="line-height: 1.5;">
+                pitch (y): <input type="text" id="pitch" size="5" style="line-height: 1.5;">
+                yaw (z): <input type="text" id="yaw" size="5" style="line-height: 1.5;">
+                <button onclick="to_quaternion()" style="line-height: 1.5;">To Quaternion</button>
                 <div id="quaternion_from_euler"></div>    
             </center>
+        </div>
+
+    <h3>Unit Quaternion Interpolation</h3>
+    <div style="line-height: 2.25;"> 
+    <center>
+        <b>Quaternion from</b>
+        <br>
+        w: <input type="text" id="quat_w_from" size="5" style="line-height: 1.5;">
+        x: <input type="text" id="quat_x_from" size="5" style="line-height: 1.5;">
+        y: <input type="text" id="quat_y_from" size="5" style="line-height: 1.5;">
+        z: <input type="text" id="quat_z_from" size="5" style="line-height: 1.5;">
+        <br>
+        <b>Quaternion to</b> 
+        <br>
+        w: <input type="text" id="quat_w_to" size="5" style="line-height: 1.5;">
+        x: <input type="text" id="quat_x_to" size="5" style="line-height: 1.5;">
+        y: <input type="text" id="quat_y_to" size="5" style="line-height: 1.5;">
+        z: <input type="text" id="quat_z_to" size="5" style="line-height: 1.5;">
+        <br>
+        interpolation coefficient: <input type="text" id="coefficient_ierp" size="5" style="line-height: 1.5;">
+        <br>
+        <button onclick="quaternion_interpolation()" style="line-height: 1.5;">Interpolate</button>    
+    </center>
+    </div>
+        <h4>Linear Interpolation: LERP</h4>
+        <p>
+            
         </p>
+        <center><div id="quaternion_lerp"></div></center>
+        <h4>Normalized Linear Interpolation: NLERP</h4>
+        <p>
+            
+        </p>
+        <center><div id="quaternion_nlerp"></div></center>
+        <h4>Spherical Linear Interpolation: SLERP</h4>
+        <p>
+            
+        </p>
+        <center><div id="quaternion_slerp"></div></center>
+        <h4>Logarithmic Interpolation</h4>
+        <p>
+            
+        </p>
+        <center><div id="quaternion_loglerp"></div></center>
     <script src="{{ url_for('static', filename='js/quaternion.js') }}"></script>
 </div>
 {% endblock %}

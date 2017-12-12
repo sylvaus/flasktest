@@ -1,4 +1,4 @@
-var ZERO_THRESHOLD = 0.0000001;
+var ZERO_THRESHOLD = 0.000001;
 var Quaternion = /** @class */ (function () {
     function Quaternion(w, x, y, z) {
         this.array = [w, x, y, z];
@@ -46,7 +46,7 @@ var Quaternion = /** @class */ (function () {
             return new Quaternion(1, 0, 0, 0);
         }
         else {
-            return new Quaternion(this.array[0] / norm, this.array[1] / norm, this.array[2] / norm, this.array[4] / norm);
+            return new Quaternion(this.array[0] / norm, this.array[1] / norm, this.array[2] / norm, this.array[3] / norm);
         }
     };
     Quaternion.prototype.scale = function (factor) {
@@ -122,16 +122,25 @@ var Quaternion = /** @class */ (function () {
         var sp = Math.sin(pitch * 0.5);
         return new Quaternion(cy * cr * cp + sy * sr * sp, cy * sr * cp - sy * cr * sp, cy * cr * sp + sy * sr * cp, sy * cr * cp - cy * sr * sp);
     };
+    Quaternion.from_axis_angle = function (axis, angle) {
+        var norm = Math.sqrt(Math.pow(axis[0], 2) + Math.pow(axis[1], 2) + Math.pow(axis[2], 2));
+        if (norm < ZERO_THRESHOLD) {
+            return new Quaternion(1.0, 0.0, 0.0, 0.0);
+        }
+        var cosHalfAngle = Math.cos(angle / 2.0);
+        var sinHalfAngle = Math.sin(angle / 2.0);
+        return new Quaternion(cosHalfAngle, sinHalfAngle * axis[0] / norm, sinHalfAngle * axis[1] / norm, sinHalfAngle * axis[2] / norm);
+    };
     return Quaternion;
 }());
 function lerp(quat_from, quat_to, coeff) {
-    var scaled_quat_from = quat_from.get_scaled(1 - coeff);
-    var scaled_quat_to = quat_from.get_scaled(coeff);
+    var scaled_quat_from = quat_from.get_scaled(1.0 - coeff);
+    var scaled_quat_to = quat_to.get_scaled(coeff);
     return scaled_quat_from.add(scaled_quat_to);
 }
 function nlerp(quat_from, quat_to, coeff) {
-    var scaled_quat_from = quat_from.get_scaled(1 - coeff);
-    var scaled_quat_to = quat_from.get_scaled(coeff);
+    var scaled_quat_from = quat_from.get_scaled(1.0 - coeff);
+    var scaled_quat_to = quat_to.get_scaled(coeff);
     var result = scaled_quat_from.add(scaled_quat_to);
     result.normalize();
     return result;
@@ -139,7 +148,7 @@ function nlerp(quat_from, quat_to, coeff) {
 function slerp(quat_from, quat_to, coeff, shortest_path) {
     if (shortest_path === void 0) { shortest_path = false; }
     var normalized_quat_from = quat_from.get_normalized();
-    var normalized_quat_to = quat_from.get_normalized();
+    var normalized_quat_to = quat_to.get_normalized();
     var dot = normalized_quat_from.dot(normalized_quat_to);
     if (Math.abs(dot) > 0.9995) {
         return nlerp(normalized_quat_from, normalized_quat_to, coeff);
@@ -148,14 +157,19 @@ function slerp(quat_from, quat_to, coeff, shortest_path) {
         dot = -dot;
         normalized_quat_to.scale(-1);
     }
-    if (Math.abs(dot) > 0) {
+    if (Math.abs(dot) > 1) {
         dot = Math.sign(dot);
     }
     var delta_angle = Math.acos(dot) * coeff;
     var quat_to_normal = normalized_quat_to.add(normalized_quat_from.get_scaled(-dot));
     quat_to_normal.normalize();
     return quat_to_normal.get_scaled(Math.sin(delta_angle))
-        .add(quat_from.get_scaled(Math.cos(delta_angle)));
+        .add(normalized_quat_from.get_scaled(Math.cos(delta_angle)));
+}
+function log_interpolation(quat_from, quat_to, coeff) {
+    var delta_quat = quat_to.mult(quat_from.get_inverse());
+    var angle = delta_quat.get_theta();
+    return Quaternion.from_axis_angle(delta_quat.get_axis(), angle * coeff).mult(quat_from);
 }
 function to_rot_matrix() {
     var quat_w = parseFloat(document.getElementById("quat_w").value);
@@ -238,4 +252,65 @@ function to_quaternion() {
         array[2].toPrecision(5) + " \\; " +
         array[3].toPrecision(5) + "]$$";
     MathJax.Hub.Queue(["Typeset", MathJax.Hub, "quaternion_from_euler"]);
+}
+function add_quaternion_to_div(div_name, quaternion) {
+    var array = quaternion.get_array();
+    document.getElementById(div_name).innerText = "$$\\mathbf{q}=\\; [" + array[0].toPrecision(5) + " \\; " +
+        array[1].toPrecision(5) + " \\; " +
+        array[2].toPrecision(5) + " \\; " +
+        array[3].toPrecision(5) + "]$$";
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub, div_name]);
+}
+function quaternion_interpolation() {
+    var quat_w_from = parseFloat(document.getElementById("quat_w_from").value);
+    var quat_x_from = parseFloat(document.getElementById("quat_x_from").value);
+    var quat_y_from = parseFloat(document.getElementById("quat_y_from").value);
+    var quat_z_from = parseFloat(document.getElementById("quat_z_from").value);
+    var quat_w_to = parseFloat(document.getElementById("quat_w_to").value);
+    var quat_x_to = parseFloat(document.getElementById("quat_x_to").value);
+    var quat_y_to = parseFloat(document.getElementById("quat_y_to").value);
+    var quat_z_to = parseFloat(document.getElementById("quat_z_to").value);
+    var coefficient = parseFloat(document.getElementById("coefficient_ierp").value);
+    if (isNaN(quat_w_from)) {
+        alert("Quaternion from w value is not a number");
+        return;
+    }
+    if (isNaN(quat_x_from)) {
+        alert("Quaternion from x value is not a number");
+        return;
+    }
+    if (isNaN(quat_y_from)) {
+        alert("Quaternion from y value is not a number");
+        return;
+    }
+    if (isNaN(quat_z_from)) {
+        alert("Quaternion from z value is not a number");
+        return;
+    }
+    if (isNaN(quat_w_to)) {
+        alert("Quaternion to w value is not a number");
+        return;
+    }
+    if (isNaN(quat_x_to)) {
+        alert("Quaternion to x value is not a number");
+        return;
+    }
+    if (isNaN(quat_y_to)) {
+        alert("Quaternion to y value is not a number");
+        return;
+    }
+    if (isNaN(quat_z_to)) {
+        alert("Quaternion to z value is not a number");
+        return;
+    }
+    if (isNaN(coefficient)) {
+        alert("Interpolation coefficient is not a number");
+        return;
+    }
+    var quaternion_from = new Quaternion(quat_w_from, quat_x_from, quat_y_from, quat_z_from);
+    var quaternion_to = new Quaternion(quat_w_to, quat_x_to, quat_y_to, quat_z_to);
+    add_quaternion_to_div("quaternion_lerp", lerp(quaternion_from, quaternion_to, coefficient));
+    add_quaternion_to_div("quaternion_nlerp", nlerp(quaternion_from, quaternion_to, coefficient));
+    add_quaternion_to_div("quaternion_slerp", slerp(quaternion_from, quaternion_to, coefficient));
+    add_quaternion_to_div("quaternion_loglerp", log_interpolation(quaternion_from, quaternion_to, coefficient));
 }

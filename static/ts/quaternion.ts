@@ -1,5 +1,7 @@
+import { isQualifiedName } from 'tsutils';
+import { QualifiedName } from 'typescript';
 
-let ZERO_THRESHOLD = 0.0000001
+let ZERO_THRESHOLD = 0.000001
 
 
 class Quaternion {
@@ -59,7 +61,7 @@ class Quaternion {
     } 
     else {
       return new Quaternion(this.array[0] / norm, this.array[1] / norm,
-                            this.array[2] / norm, this.array[4] / norm)
+                            this.array[2] / norm, this.array[3] / norm)
     }
   }
 
@@ -74,7 +76,7 @@ class Quaternion {
 
   add(other : Quaternion) : Quaternion {
     return new Quaternion(this.array[0] + other.array[0], this.array[1] + other.array[1],
-                          this.array[2] + other.array[2], this.array[3] + other.array[3])
+                          this.array[2] + other.array[2], this.array[3] + other.array[3]);
   }
 
   mult(other : Quaternion) : Quaternion {
@@ -82,12 +84,12 @@ class Quaternion {
                           this.array[0] * other.array[1] + this.array[1] * other.array[0] + this.array[2] * other.array[3]- this.array[3] * other.array[2],
                           this.array[0] * other.array[2] - this.array[1] * other.array[3] + this.array[2] * other.array[0]+ this.array[3] * other.array[1],
                           this.array[0] * other.array[3] + this.array[1] * other.array[2] - this.array[2] * other.array[1]+ this.array[3] * other.array[0],
-    )
+    );
   }
 
   dot(other : Quaternion) : number {
     return (this.array[0] * other.array[0] + this.array[1] * other.array[1]
-            + this.array[2] * other.array[2] + this.array[3] * other.array[3])
+            + this.array[2] * other.array[2] + this.array[3] * other.array[3]);
   }
 
   /** Quaternion to rotation matrix based on 
@@ -156,17 +158,30 @@ class Quaternion {
                           cy * cr * sp + sy * sr * cp,
                           sy * cr * cp - cy * sr * sp)
   }
+
+  static from_axis_angle(axis : number [], angle : number) {
+    let norm = Math.sqrt(axis[0] ** 2 + axis[1] ** 2 + axis[2] ** 2);
+    if(norm < ZERO_THRESHOLD) {
+      return new Quaternion(1.0, 0.0, 0.0, 0.0);
+    }
+    let cosHalfAngle = Math.cos(angle / 2.0);
+    let sinHalfAngle = Math.sin(angle / 2.0);
+    return new Quaternion(cosHalfAngle, 
+                          sinHalfAngle * axis[0] / norm,
+                          sinHalfAngle * axis[1] / norm,
+                          sinHalfAngle * axis[2] / norm);
+  }
 }
 
 function lerp(quat_from : Quaternion, quat_to : Quaternion, coeff : number) : Quaternion {
-  let scaled_quat_from = quat_from.get_scaled(1 - coeff);
-  let scaled_quat_to = quat_from.get_scaled(coeff);
+  let scaled_quat_from = quat_from.get_scaled(1.0 - coeff);
+  let scaled_quat_to = quat_to.get_scaled(coeff);
   return scaled_quat_from.add(scaled_quat_to);
 }
 
 function nlerp(quat_from : Quaternion, quat_to : Quaternion, coeff : number) : Quaternion {
-  let scaled_quat_from = quat_from.get_scaled(1 - coeff);
-  let scaled_quat_to = quat_from.get_scaled(coeff);
+  let scaled_quat_from = quat_from.get_scaled(1.0 - coeff);
+  let scaled_quat_to = quat_to.get_scaled(coeff);
   let result = scaled_quat_from.add(scaled_quat_to);
   result.normalize();
   return result;
@@ -175,10 +190,10 @@ function nlerp(quat_from : Quaternion, quat_to : Quaternion, coeff : number) : Q
 function slerp(quat_from : Quaternion, quat_to : Quaternion, 
                coeff : number, shortest_path : boolean = false) : Quaternion {
   let normalized_quat_from = quat_from.get_normalized();
-  let normalized_quat_to = quat_from.get_normalized();
+  let normalized_quat_to = quat_to.get_normalized();
   let dot = normalized_quat_from.dot(normalized_quat_to);
   if (Math.abs(dot) > 0.9995) {
-    return nlerp(normalized_quat_from, normalized_quat_to, coeff)
+    return nlerp(normalized_quat_from, normalized_quat_to, coeff);
   }
 
   if (shortest_path && (dot < 0.0)){
@@ -186,7 +201,7 @@ function slerp(quat_from : Quaternion, quat_to : Quaternion,
     normalized_quat_to.scale(-1)
   }
 
-  if (Math.abs(dot) > 0){
+  if (Math.abs(dot) > 1){
     dot = Math.sign(dot)
   }
 
@@ -195,8 +210,15 @@ function slerp(quat_from : Quaternion, quat_to : Quaternion,
   quat_to_normal.normalize();
 
   return quat_to_normal.get_scaled(Math.sin(delta_angle))
-          .add(quat_from.get_scaled(Math.cos(delta_angle)));
+          .add(normalized_quat_from.get_scaled(Math.cos(delta_angle)));
+}
 
+function log_interpolation(quat_from : Quaternion, 
+                           quat_to : Quaternion, 
+                           coeff : number) : Quaternion {
+  let delta_quat = quat_to.mult(quat_from.get_inverse());
+  let angle = delta_quat.get_theta();
+  return Quaternion.from_axis_angle(delta_quat.get_axis(), angle * coeff).mult(quat_from);
 }
 
 
@@ -252,6 +274,38 @@ function to_quaternion(){
   MathJax.Hub.Queue(["Typeset",MathJax.Hub,"quaternion_from_euler"]);
 }
 
+function add_quaternion_to_div(div_name : string, quaternion : Quaternion){
+  var array = quaternion.get_array();
+  (<HTMLDivElement>document.getElementById(div_name)).innerText =  "$$\\mathbf{q}=\\; [" + array[0].toPrecision(5) + " \\; " +
+                                                                                          array[1].toPrecision(5) + " \\; " + 
+                                                                                          array[2].toPrecision(5) + " \\; " + 
+                                                                                          array[3].toPrecision(5) + "]$$";
+  MathJax.Hub.Queue(["Typeset", MathJax.Hub, div_name]);
+}
 
-
-
+function quaternion_interpolation(){
+  var quat_w_from = parseFloat((<HTMLInputElement>document.getElementById("quat_w_from")).value);
+  var quat_x_from = parseFloat((<HTMLInputElement>document.getElementById("quat_x_from")).value);
+  var quat_y_from = parseFloat((<HTMLInputElement>document.getElementById("quat_y_from")).value);
+  var quat_z_from = parseFloat((<HTMLInputElement>document.getElementById("quat_z_from")).value);
+  var quat_w_to = parseFloat((<HTMLInputElement>document.getElementById("quat_w_to")).value);
+  var quat_x_to = parseFloat((<HTMLInputElement>document.getElementById("quat_x_to")).value);
+  var quat_y_to = parseFloat((<HTMLInputElement>document.getElementById("quat_y_to")).value);
+  var quat_z_to = parseFloat((<HTMLInputElement>document.getElementById("quat_z_to")).value);
+  var coefficient = parseFloat((<HTMLInputElement>document.getElementById("coefficient_ierp")).value);
+  if(isNaN(quat_w_from)){alert("Quaternion from w value is not a number"); return;}
+  if(isNaN(quat_x_from)){alert("Quaternion from x value is not a number"); return;}
+  if(isNaN(quat_y_from)){alert("Quaternion from y value is not a number"); return;}
+  if(isNaN(quat_z_from)){alert("Quaternion from z value is not a number"); return;}
+  if(isNaN(quat_w_to)){alert("Quaternion to w value is not a number"); return;}
+  if(isNaN(quat_x_to)){alert("Quaternion to x value is not a number"); return;}
+  if(isNaN(quat_y_to)){alert("Quaternion to y value is not a number"); return;}
+  if(isNaN(quat_z_to)){alert("Quaternion to z value is not a number"); return;}
+  if(isNaN(coefficient)){alert("Interpolation coefficient is not a number"); return;}
+  var quaternion_from =  new Quaternion(quat_w_from, quat_x_from, quat_y_from, quat_z_from);
+  var quaternion_to =  new Quaternion(quat_w_to, quat_x_to, quat_y_to, quat_z_to);
+  add_quaternion_to_div("quaternion_lerp", lerp(quaternion_from, quaternion_to, coefficient));
+  add_quaternion_to_div("quaternion_nlerp", nlerp(quaternion_from, quaternion_to, coefficient));
+  add_quaternion_to_div("quaternion_slerp", slerp(quaternion_from, quaternion_to, coefficient));
+  add_quaternion_to_div("quaternion_loglerp", log_interpolation(quaternion_from, quaternion_to, coefficient));
+}
