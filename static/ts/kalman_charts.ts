@@ -257,56 +257,60 @@ function draw_point(ctx: CanvasRenderingContext2D,
   ctx.fillRect(x, y, 5, 5);
 }
 
-function make_chart(div_name : string,
-                    title : string,
-                    array: Array<{x : number, y : number}>, 
-                    array_noise : Array<{x : number, y : number}>, 
-                    array_filtered : Array<{x : number, y : number}>) : CanvasJS.Chart{
-  return new CanvasJS.Chart(div_name, {
-    title: {
-      text: title
-    },
-    axisY: {
-      includeZero: false
-    },
-    data: [{
-      type: "line",
-      markerSize: 2,
-      lineThickness: 1,
-      dataPoints: array
-    },
-    {
-      type: "line",
-      markerSize: 2,
-      lineThickness: 1,
-      dataPoints: array_noise
-    },
-    {
-      type: "line",
-      markerSize: 2,
-      lineThickness: 1,
-      dataPoints: array_filtered
-    }]
-  });
+class Graph {
+    plotted_once : boolean;
+    div_name : string;
+    data : Array<{x : Array<number>, y : Array<number>, 
+                  mode : string, type : string, 
+                  marker : { size: number }, name : string}>;
+    layout : {autosize: boolean, width: number,
+              height: number, title : string};
+    constructor(div_name : string, 
+                data : Array<{x : Array<number>, y : Array<number>, 
+                              mode : string, type : string, 
+                              marker : { size: number }, name : string}>, 
+                layout : {autosize: boolean, width: number,
+                          height: number, title : string}){
+        this.div_name = div_name;
+        this.data = data;
+        this.layout = layout;
+        this.plotted_once = false;
+    }
+
+    plot() {
+        if(this.plotted_once){
+            let update = {x : [], y : []}
+            this.data.forEach(element => {
+                update.x.push(element.x);
+                update.y.push(element.y);
+            });
+            Plotly.restyle(this.div_name, update, [0, 1, 2])
+        } else {
+            Plotly.newPlot(this.div_name, this.data, this.layout);
+            this.plotted_once = true;
+        }
+    }
+
 }
 
 class KalmanGraph {
   filter : KalmanFilter;
   canvas : CanvasRenderingContext2D;
   run : boolean;
-  x : Array<{x : number, y : number}>;
-  y : Array<{x : number, y : number}>;
-  x_noise : Array<{x : number, y : number}>;
-  y_noise : Array<{x : number, y : number}>;
-  x_filtered : Array<{x : number, y : number}>;
-  y_filtered : Array<{x : number, y : number}>;
-  chartX : CanvasJS.Chart;
-  chartY : CanvasJS.Chart;
+  time : Array<number>
+  x : Array<number>;
+  y : Array<number>;
+  x_noise : Array<number>;
+  y_noise : Array<number>;
+  x_filtered : Array<number>;
+  y_filtered : Array<number>;
+  chartX : Graph;
+  chartY : Graph;
   time_counter : number;
   render_counter : number;
 
-  DELTA_TIME = 0.01;
-  ARRAY_SIZE = 500;
+  DELTA_TIME = 0.02;
+  ARRAY_SIZE = 300;
 
   constructor(F : Matrix, B : Matrix, H : Matrix, Q : Matrix, 
               R : Matrix, P : Matrix, x : Matrix, 
@@ -317,14 +321,23 @@ class KalmanGraph {
     this.canvas = canvas;
     this.time_counter = 0;
     this.render_counter = 0;
+    this.time = [];
     this.x = []; 
     this.x_noise = [];
     this.x_filtered = [];
     this.y = [];
     this.y_noise = [];
     this.y_filtered = [];
-    this.chartX = make_chart(chartX_div_name, "X position", this.x, this.x_noise, this.x_filtered);
-    this.chartY = make_chart(chartY_div_name, "Y position", this.y, this.y_noise, this.y_filtered);
+    this.chartX = new Graph(chartX_div_name, 
+                            [{x: this.time, y: this.x, mode: 'markers',type: 'scattergl', marker : { size: 3 }, name : "x real"},
+                             {x: this.time, y: this.x_noise, mode: 'markers',type: 'scattergl', marker : { size: 3 }, name : "x noise"},
+                             {x: this.time, y: this.x_filtered, mode: 'markers',type: 'scattergl', marker : { size: 3 }, name : "x filtered"}], 
+                            {autosize: false, width: 400, height: 370, title: "X position"});
+    this.chartY = new Graph(chartY_div_name, 
+                            [{x: this.time, y: this.y, mode: 'markers',type: 'scattergl', marker : { size: 3 }, name : "y real"},
+                             {x: this.time, y: this.y_noise, mode: 'markers',type: 'scattergl', marker : { size: 3 }, name : "y noise"},
+                             {x: this.time, y: this.y_filtered, mode: 'markers',type: 'scattergl', marker : { size: 3 }, name : "y filtered"}], 
+                            {autosize: false, width: 400, height: 370, title: "Y position"});
   }
 
   cyclic_call() {
@@ -347,23 +360,25 @@ class KalmanGraph {
     draw_point(this.canvas, x_noise, y_noise, "blue");
     draw_point(this.canvas, x_filtered, y_filtered, "green");
 
-    this.x.push({x: this.time_counter, y: x});
-    this.x_noise.push({x: this.time_counter, y: x_noise});
-    this.x_filtered.push({x: this.time_counter, y: state_kalman.get(0, 0)});
-    this.y.push({x: this.time_counter, y: y});
-    this.y_noise.push({x: this.time_counter, y: y_noise});
-    this.y_filtered.push({x: this.time_counter, y: state_kalman.get(1, 0)});
+    this.time.push(this.time_counter);
+    this.x.push(x);
+    this.x_noise.push(x_noise);
+    this.x_filtered.push(state_kalman.get(0, 0));
+    this.y.push(y);
+    this.y_noise.push(y_noise);
+    this.y_filtered.push(state_kalman.get(1, 0));
 
     this.shift_arrays();
 
-    if ((this.render_counter % 10) == 0) {
+    if ((this.render_counter % 30) == 0) {
       this.render_counter = 0;
-      this.chartX.render();
-      this.chartY.render();
+      this.chartX.plot();
+      this.chartY.plot();
     }
   }
 
   shift_arrays() {
+    if (this.time.length > this.ARRAY_SIZE) {this.time.shift();}
     if (this.x.length > this.ARRAY_SIZE) {this.x.shift();}
     if (this.x_noise.length > this.ARRAY_SIZE) {this.x_noise.shift();}
     if (this.x_filtered.length > this.ARRAY_SIZE) {this.x_filtered.shift();}
@@ -382,7 +397,7 @@ function gameLoop(timestamp) {
 }
 
 let last_tick : number;
-let period = 10;
+let period = 20;
 
 let kalman_kinematic_graph : KalmanGraph;
 let kalman_dynamic_graph : KalmanGraph;
@@ -390,7 +405,7 @@ let kalman_dynamic_graph : KalmanGraph;
 window.onload = () => {
   let canvas = (<HTMLCanvasElement>document.getElementById('cnvs')).getContext("2d");
 
-  let dt = 0.1;
+  let dt = 0.15;
   let F = new Matrix(4, 4, [1, 0, dt, 0,
                             0, 1, 0, dt,
                             0, 0, 1, 0,

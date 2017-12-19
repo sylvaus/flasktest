@@ -64,7 +64,7 @@ def computedtorque():
 
 @app.route('/kalman')
 def kalman():
-    return render_template('kalman.html', active_page=CONTROL_NB, latex_notation=True)
+    return render_template('kalman.html', active_page=CONTROL_NB, latex_notation=True, plotly=True)
 
 
 @app.route('/filters')

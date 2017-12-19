@@ -220,50 +220,50 @@ function draw_point(ctx, x, y, color) {
     ctx.fillStyle = color;
     ctx.fillRect(x, y, 5, 5);
 }
-function make_chart(div_name, title, array, array_noise, array_filtered) {
-    return new CanvasJS.Chart(div_name, {
-        title: {
-            text: title
-        },
-        axisY: {
-            includeZero: false
-        },
-        data: [{
-                type: "line",
-                markerSize: 2,
-                lineThickness: 1,
-                dataPoints: array
-            },
-            {
-                type: "line",
-                markerSize: 2,
-                lineThickness: 1,
-                dataPoints: array_noise
-            },
-            {
-                type: "line",
-                markerSize: 2,
-                lineThickness: 1,
-                dataPoints: array_filtered
-            }]
-    });
-}
+var Graph = /** @class */ (function () {
+    function Graph(div_name, data, layout) {
+        this.div_name = div_name;
+        this.data = data;
+        this.layout = layout;
+        this.plotted_once = false;
+    }
+    Graph.prototype.plot = function () {
+        if (this.plotted_once) {
+            var update_1 = { x: [], y: [] };
+            this.data.forEach(function (element) {
+                update_1.x.push(element.x);
+                update_1.y.push(element.y);
+            });
+            Plotly.restyle(this.div_name, update_1, [0, 1, 2]);
+        }
+        else {
+            Plotly.newPlot(this.div_name, this.data, this.layout);
+            this.plotted_once = true;
+        }
+    };
+    return Graph;
+}());
 var KalmanGraph = /** @class */ (function () {
     function KalmanGraph(F, B, H, Q, R, P, x, canvas, chartX_div_name, chartY_div_name) {
-        this.DELTA_TIME = 0.01;
-        this.ARRAY_SIZE = 500;
+        this.DELTA_TIME = 0.02;
+        this.ARRAY_SIZE = 300;
         this.filter = new KalmanFilter(F, B, H, Q, R, P, x);
         this.canvas = canvas;
         this.time_counter = 0;
         this.render_counter = 0;
+        this.time = [];
         this.x = [];
         this.x_noise = [];
         this.x_filtered = [];
         this.y = [];
         this.y_noise = [];
         this.y_filtered = [];
-        this.chartX = make_chart(chartX_div_name, "X position", this.x, this.x_noise, this.x_filtered);
-        this.chartY = make_chart(chartY_div_name, "Y position", this.y, this.y_noise, this.y_filtered);
+        this.chartX = new Graph(chartX_div_name, [{ x: this.time, y: this.x, mode: 'markers', type: 'scattergl', marker: { size: 3 }, name: "x real" },
+            { x: this.time, y: this.x_noise, mode: 'markers', type: 'scattergl', marker: { size: 3 }, name: "x noise" },
+            { x: this.time, y: this.x_filtered, mode: 'markers', type: 'scattergl', marker: { size: 3 }, name: "x filtered" }], { autosize: false, width: 400, height: 370, title: "X position" });
+        this.chartY = new Graph(chartY_div_name, [{ x: this.time, y: this.y, mode: 'markers', type: 'scattergl', marker: { size: 3 }, name: "y real" },
+            { x: this.time, y: this.y_noise, mode: 'markers', type: 'scattergl', marker: { size: 3 }, name: "y noise" },
+            { x: this.time, y: this.y_filtered, mode: 'markers', type: 'scattergl', marker: { size: 3 }, name: "y filtered" }], { autosize: false, width: 400, height: 370, title: "Y position" });
     }
     KalmanGraph.prototype.cyclic_call = function () {
         if (!this.run) {
@@ -282,20 +282,24 @@ var KalmanGraph = /** @class */ (function () {
         draw_point(this.canvas, x, y, "red");
         draw_point(this.canvas, x_noise, y_noise, "blue");
         draw_point(this.canvas, x_filtered, y_filtered, "green");
-        this.x.push({ x: this.time_counter, y: x });
-        this.x_noise.push({ x: this.time_counter, y: x_noise });
-        this.x_filtered.push({ x: this.time_counter, y: state_kalman.get(0, 0) });
-        this.y.push({ x: this.time_counter, y: y });
-        this.y_noise.push({ x: this.time_counter, y: y_noise });
-        this.y_filtered.push({ x: this.time_counter, y: state_kalman.get(1, 0) });
+        this.time.push(this.time_counter);
+        this.x.push(x);
+        this.x_noise.push(x_noise);
+        this.x_filtered.push(state_kalman.get(0, 0));
+        this.y.push(y);
+        this.y_noise.push(y_noise);
+        this.y_filtered.push(state_kalman.get(1, 0));
         this.shift_arrays();
-        if ((this.render_counter % 10) == 0) {
+        if ((this.render_counter % 30) == 0) {
             this.render_counter = 0;
-            this.chartX.render();
-            this.chartY.render();
+            this.chartX.plot();
+            this.chartY.plot();
         }
     };
     KalmanGraph.prototype.shift_arrays = function () {
+        if (this.time.length > this.ARRAY_SIZE) {
+            this.time.shift();
+        }
         if (this.x.length > this.ARRAY_SIZE) {
             this.x.shift();
         }
@@ -325,12 +329,12 @@ function gameLoop(timestamp) {
     requestAnimationFrame(gameLoop);
 }
 var last_tick;
-var period = 10;
+var period = 20;
 var kalman_kinematic_graph;
 var kalman_dynamic_graph;
 window.onload = function () {
     var canvas = document.getElementById('cnvs').getContext("2d");
-    var dt = 0.1;
+    var dt = 0.15;
     var F = new Matrix(4, 4, [1, 0, dt, 0,
         0, 1, 0, dt,
         0, 0, 1, 0,
