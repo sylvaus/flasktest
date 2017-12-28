@@ -2,36 +2,43 @@
 {% block content %}
 <div class="kalman">
   <div class="title">Kalman Filter</div>
-  <p>Here, I will not show how to derive the equations of a Kalman filter but describe its terms
+  <p>Here, I will not show how to derive the equations of a Kalman filter but describe briefly its terms
   and show two implementation of Kalman filters. <br>
-  Information on how to derive the following equations can be found on this <a href="http://www.bzarg.com/p/how-a-kalman-filter-works-in-pictures/">website</a> 
+  Information on how to derive the following equations and more in depth explanations can be found on this <a href="http://www.bzarg.com/p/how-a-kalman-filter-works-in-pictures/">website</a> 
   and on <a href="https://en.wikipedia.org/wiki/Kalman_filter">Wikipedia</a>.
   </p>
   <h3>Equations</h3>
   <h4>Prediction</h4>
-  <center>$$
-      \begin{align*}
+  <div class="equation">$$
+      \begin{align}
       &State \; prediction &\mathbf{x} &= \mathbf{F} \mathbf{x} \text{ + } \mathbf{B} \mathbf{u} \\
       &Estimate \; covariance \; prediction &\mathbf{P} &= \mathbf{F} \mathbf{P} \mathbf{F}^T \text{ + } \mathbf{Q} 
-      \end{align*}$$
-  </center>
+      \end{align}$$
+  </div>
   <h4>Update</h4>
-  <center>$$
-      \begin{align*}
+  <div class="equation">$$
+      \begin{align}
       &Pre\text{-}fit \; residual \; measurement &\mathbf{y} &= \mathbf{z} \text{ - } \mathbf{H}  \mathbf{x} \\
       &Pre\text{-}fit \; residual \; covariance &\mathbf{S} &= \mathbf{R} \text{ + } \mathbf{H} \mathbf{P} \mathbf{H}^T \\
       &Optimal \; Kalman \; Gain &\mathbf{K} &= \mathbf{P} \mathbf{H}^T \mathbf{S}^{-1} \\
       &State \; estimate \; update &\mathbf{x} &= \mathbf{x} \text{ + } \mathbf{K} \mathbf{y} \\
       &Estimate \; covariance \; update &\mathbf{P} &= \mathbf{P}  \text{ - } \mathbf{K} \mathbf{S} \mathbf{K}^T \\
       &Post\text{-}fit \; residual \; measurement &\mathbf{y} &= \mathbf{z} \text{ - } \mathbf{H}  \mathbf{x} \\
-      \end{align*}$$
-  </center>
+      \end{align}$$
+  </div>
+  <h3>Terms</h3>
+  <p>`\mathbf{x}` : The state estimated by the filter</p>
+  <p>`\mathbf{F}` : The state transition model; it computes the state at time t+1 knowing the state at time t (see equation 1).</p>
+  <p>`\mathbf{u}` : The control vector; it contains measurements that can be used to compute the next state (see equation 1)..</p>
+  <p>`\mathbf{B}` : The control input model; it uses `\mathbf{u}` (if available) to complete the computation of the state at time t+1 knowing the state at time t using `\mathbf{F}` (see equation 1).</p>
+  <p>`\mathbf{z}` : The measurements coming from the sensors</p>
 
-
+  <h3>Kinematic Kalman Filter</h3>
   <center>
     <canvas id="cnvs" height="400" width="800"></canvas><br>
     <div id="kalman_kinematic_graph_x" style="height: 370px; width:400px; display: inline-block;"></div>
     <div id="kalman_kinematic_graph_y" style="height: 370px; width:400px; display: inline-block;"></div><br>
+    <button onclick="start_stop_kinematic()" style="line-height: 1.5;">Start/Stop</button>
     <script src="{{ url_for('static', filename='js/kalman_charts.js') }}"></script>
   </center>
 

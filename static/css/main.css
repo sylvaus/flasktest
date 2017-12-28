@@ -71,9 +71,15 @@ div .extended .title {
     border-bottom: 1px solid #9F9F9F;
 }
 
+div .extended .equation {
+    text-align: center;
+    margin-left: 70px;
+    margin-right: 70px;
+}
+
 div .extended p {
-    padding-left: 70px;
-    padding-right: 70px;
+    margin-left: 70px;
+    margin-right: 70px;
     font-family: sans-serif;
     font-size: 15px;
     line-height: 1.4;

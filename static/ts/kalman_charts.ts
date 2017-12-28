@@ -308,6 +308,7 @@ class KalmanGraph {
   chartY : Graph;
   time_counter : number;
   render_counter : number;
+  last_tick : number;
 
   DELTA_TIME = 0.02;
   ARRAY_SIZE = 300;
@@ -317,10 +318,12 @@ class KalmanGraph {
               canvas : CanvasRenderingContext2D,
               chartX_div_name : string,
               chartY_div_name : string,){
+    this.run = false;
     this.filter = new KalmanFilter(F, B, H, Q, R, P, x);
     this.canvas = canvas;
     this.time_counter = 0;
-    this.render_counter = 0;
+    this.render_counter = -1;
+    this.last_tick = Date.now();
     this.time = [];
     this.x = []; 
     this.x_noise = [];
@@ -340,8 +343,8 @@ class KalmanGraph {
                             {autosize: false, width: 400, height: 370, title: "Y position"});
   }
 
-  cyclic_call() {
-    if(!this.run) {
+  cyclic_call(first_call : boolean = false) {
+    if(((!this.run) || ((Date.now() - this.last_tick) < period)) && !first_call) {
       return;
     }
     this.time_counter += this.DELTA_TIME;
@@ -375,6 +378,7 @@ class KalmanGraph {
       this.chartX.plot();
       this.chartY.plot();
     }
+    this.last_tick = Date.now();
   }
 
   shift_arrays() {
@@ -389,14 +393,11 @@ class KalmanGraph {
 }
 
 function gameLoop(timestamp) {
-  if((Date.now() - last_tick) > period){
-    kalman_kinematic_graph.cyclic_call();
-    last_tick = Date.now();
-  }
+  kalman_kinematic_graph.cyclic_call();
+  //kalman_dynamic_graph.cyclic_call();
   requestAnimationFrame(gameLoop);
 }
 
-let last_tick : number;
 let period = 20;
 
 let kalman_kinematic_graph : KalmanGraph;
@@ -405,7 +406,7 @@ let kalman_dynamic_graph : KalmanGraph;
 window.onload = () => {
   let canvas = (<HTMLCanvasElement>document.getElementById('cnvs')).getContext("2d");
 
-  let dt = 0.15;
+  let dt = 0.020;
   let F = new Matrix(4, 4, [1, 0, dt, 0,
                             0, 1, 0, dt,
                             0, 0, 1, 0,
@@ -413,10 +414,10 @@ window.onload = () => {
   let B = null;
   let H = new Matrix(2, 4, [1, 0, 0, 0,
                             0, 1, 0, 0]);
-  let Q = new Matrix(4, 4, [1, 0, 0, 0,
-                            0, 1, 0, 0,
-                            0, 0, 1, 0,
-                            0, 0, 0, 1]);
+  let Q = new Matrix(4, 4, [3, 0, 0, 0,
+                            0, 3, 0, 0,
+                            0, 0, 3, 0,
+                            0, 0, 0, 3]);
                           
   let R = new Matrix(2, 2, [100, 0,
                             0, 100]);
@@ -427,7 +428,10 @@ window.onload = () => {
                             0, 0, 0, 1]);                        
   let state = new Matrix(4, 1, [0, 0, 0, 0]);
   kalman_kinematic_graph = new KalmanGraph(F, B, H, Q, R, P, state, canvas, "kalman_kinematic_graph_x", "kalman_kinematic_graph_y");
-  kalman_kinematic_graph.run = true;
-  last_tick = Date.now();
+  kalman_kinematic_graph.cyclic_call(true);
   gameLoop(0);
+}
+
+function start_stop_kinematic() {
+    kalman_kinematic_graph.run = !kalman_kinematic_graph.run
 }
